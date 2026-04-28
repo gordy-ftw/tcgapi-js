@@ -1,0 +1,66 @@
+{
+  "name": "tcgapi",
+  "version": "0.1.0",
+  "description": "Official JavaScript/TypeScript SDK for tcgapi.dev — pricing data for Pokemon, Magic: The Gathering, Yu-Gi-Oh!, Lorcana, One Piece, Flesh and Blood, and 80+ more trading card games.",
+  "keywords": [
+    "tcg",
+    "tcgplayer",
+    "pokemon",
+    "pokemon-tcg",
+    "pokemon-prices",
+    "magic-the-gathering",
+    "mtg",
+    "yugioh",
+    "lorcana",
+    "one-piece-tcg",
+    "flesh-and-blood",
+    "card-prices",
+    "tcg-api",
+    "tcgapi",
+    "trading-cards",
+    "sdk"
+  ],
+  "homepage": "https://tcgapi.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gordy-ftw/tcgapi-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gordy-ftw/tcgapi-js/issues"
+  },
+  "author": "tcgapi.dev",
+  "license": "MIT",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/*.test.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
