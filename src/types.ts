@@ -57,6 +57,12 @@ export interface Price {
   price_change_7d: number | null;
   price_change_30d: number | null;
   last_updated_at: string;
+  /** Copies sold in the latest enriched month window. Pro/Business tiers only — absent below Pro. */
+  sales_volume?: number | null;
+  /** Average sale price over the same window. Pro/Business tiers only — absent below Pro. */
+  avg_sales_price?: number | null;
+  /** Date of the sales snapshot. Pro/Business tiers only — absent below Pro. */
+  sales_as_of?: string | null;
 }
 
 export interface CardWithPrice {
