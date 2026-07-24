@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TCGApi, NotFoundError, TcgApiError } from '../dist/index.js';
+import { TCGApi, NotFoundError, TcgApiError, TierError } from '../dist/index.js';
 
 const tcg = new TCGApi();
 // Endpoints under x402 pricing (search, top-movers, etc) require a key for free use.
@@ -46,4 +46,36 @@ test('search.cards without key returns 402 typed error', { skip: hasKey }, async
 test('prices.topMovers requires key (skipped without TCGAPI_KEY)', { skip: !hasKey }, async () => {
   const resp = await tcg.prices.topMovers({ limit: 3 });
   assert.ok(Array.isArray(resp.data));
+});
+
+test('cards.conditions without key returns 402 typed error', { skip: hasKey }, async () => {
+  await assert.rejects(
+    () => tcg.cards.conditions(13217),
+    (err) => err instanceof TcgApiError && err.status === 402,
+  );
+});
+
+test('cards.conditions returns condition rows (Pro+; TierError below)', { skip: !hasKey }, async () => {
+  try {
+    const resp = await tcg.cards.conditions(13217);
+    assert.ok(Array.isArray(resp.data));
+  } catch (err) {
+    assert.ok(err instanceof TierError, 'expected TierError for sub-Pro keys');
+  }
+});
+
+test('bulk.conditions without key returns 402 typed error', { skip: hasKey }, async () => {
+  await assert.rejects(
+    () => tcg.bulk.conditions([13217]),
+    (err) => err instanceof TcgApiError && err.status === 402,
+  );
+});
+
+test('bulk.conditions returns rows (Pro+; TierError below)', { skip: !hasKey }, async () => {
+  try {
+    const resp = await tcg.bulk.conditions([13217]);
+    assert.ok(Array.isArray(resp.data));
+  } catch (err) {
+    assert.ok(err instanceof TierError, 'expected TierError for sub-Pro keys');
+  }
 });

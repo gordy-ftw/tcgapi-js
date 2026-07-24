@@ -92,6 +92,23 @@ const bulk = await tcg.bulk.prices([1, 2, 3, /* ... up to thousands */]);
 console.log(`Got prices for ${bulk.data.length} card-printings`);
 ```
 
+### Per-condition prices (Pro+)
+
+```ts
+// Price floors per (printing, condition) — Near Mint, Lightly Played, etc.
+const conditions = await tcg.cards.conditions(13217, { printing: 'Holofoil' });
+for (const row of conditions.data) {
+  // median_with_shipping is robust to $0.01 junk listings — prefer it when pricing inventory
+  console.log(`${row.printing} / ${row.condition}: $${row.median_with_shipping}`);
+}
+console.log(conditions.meta?.cached, conditions.meta?.condition_counts);
+
+// Bulk variant — up to 500 cards per call, served from the nightly cache.
+// Cards without condition data yet are absent; fetch them once via
+// tcg.cards.conditions() to warm them.
+const bulkConditions = await tcg.bulk.conditions([13217, 13218, 13219]);
+```
+
 ### Top movers
 
 ```ts

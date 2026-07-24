@@ -126,6 +126,40 @@ export interface BulkCard extends Card {
   prices: Price[];
 }
 
+export interface ConditionPrice {
+  card_id: number;
+  printing: string;
+  /** TCGPlayer condition grade, e.g. "Near Mint", "Lightly Played". */
+  condition: string;
+  language: string;
+  /** Lowest listed item price for this printing + condition. */
+  low_price: number | null;
+  /** Lowest listed price including shipping. */
+  lowest_with_shipping: number | null;
+  /** Median of sampled shipping-inclusive prices. Null when sample_count < 3 — prefer this over low_price when pricing inventory. */
+  median_with_shipping: number | null;
+  /** Number of listings sampled for this row (not total market depth — see ConditionMeta.condition_counts). */
+  sample_count: number;
+  last_updated_at: string;
+}
+
+/** Row shape of /bulk/conditions — a ConditionPrice plus card identity. */
+export interface BulkConditionRow extends ConditionPrice {
+  name: string;
+  tcgplayer_id: number | null;
+}
+
+/** Meta for /cards/{id}/prices/conditions — cache/staleness signals. */
+export interface ConditionMeta {
+  /** True when served from cache without a live refresh. */
+  cached?: boolean;
+  /** Present (true) when rows are older than 24h and a live refresh wasn't possible (quota or upstream failure). */
+  stale?: boolean;
+  as_of?: string | null;
+  /** Total live listings per condition across ALL printings (only present on live-refreshed responses). */
+  condition_counts?: Record<string, number>;
+}
+
 export interface PriceHistoryPoint {
   date: string;
   printing: string | null;
@@ -187,9 +221,10 @@ export interface UsageResponse {
 }
 
 // Wrapper returned by every list/detail call. Lets callers reach `meta` and `rateLimit`
-// without losing access to the typed payload.
-export interface Response<T> {
+// without losing access to the typed payload. The second parameter overrides the meta
+// shape for endpoints with a non-standard meta (e.g. per-condition prices).
+export interface Response<T, M = Meta> {
   data: T;
-  meta?: Meta;
+  meta?: M;
   rateLimit?: RateLimit;
 }

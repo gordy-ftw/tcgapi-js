@@ -1,9 +1,10 @@
 import type { TCGApi } from '../client';
-import type { BulkCard, BulkPriceRow, PriceHistoryPoint, Response } from '../types';
+import type { BulkCard, BulkConditionRow, BulkPriceRow, PriceHistoryPoint, Response } from '../types';
 
 const BULK_PRICES_MAX = 500;
 const BULK_CARDS_MAX = 100;
 const BULK_HISTORY_MAX = 50;
+const BULK_CONDITIONS_MAX = 500;
 
 function joinIds(ids: number[]): string {
   if (ids.length === 0) throw new Error('At least one card ID required');
@@ -46,6 +47,27 @@ export class BulkResource {
     for (let i = 0; i < ids.length; i += BULK_CARDS_MAX) {
       const chunk = ids.slice(i, i + BULK_CARDS_MAX);
       const resp = await this.client.request<BulkCard[]>('GET', '/bulk/cards', { ids: joinIds(chunk) });
+      all.push(...resp.data);
+      lastRateLimit = resp.rateLimit;
+    }
+    return { data: all, meta: { total: all.length }, rateLimit: lastRateLimit };
+  }
+
+  /**
+   * GET /bulk/conditions — per-condition prices for up to 500 cards per call. Pro+ tier.
+   * Served entirely from the nightly cache (never triggers live fetches); cards without
+   * condition data yet are absent from the result — request them once via
+   * cards.conditions() to warm them. Auto-chunks for larger lists.
+   */
+  async conditions(ids: number[]): Promise<Response<BulkConditionRow[]>> {
+    if (ids.length <= BULK_CONDITIONS_MAX) {
+      return this.client.request<BulkConditionRow[]>('GET', '/bulk/conditions', { ids: joinIds(ids) });
+    }
+    const all: BulkConditionRow[] = [];
+    let lastRateLimit;
+    for (let i = 0; i < ids.length; i += BULK_CONDITIONS_MAX) {
+      const chunk = ids.slice(i, i + BULK_CONDITIONS_MAX);
+      const resp = await this.client.request<BulkConditionRow[]>('GET', '/bulk/conditions', { ids: joinIds(chunk) });
       all.push(...resp.data);
       lastRateLimit = resp.rateLimit;
     }

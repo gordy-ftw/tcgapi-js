@@ -1,5 +1,5 @@
 import type { TCGApi } from '../client';
-import type { BulkCard, Card, Price, PriceHistoryPoint, Response } from '../types';
+import type { BulkCard, Card, ConditionMeta, ConditionPrice, Price, PriceHistoryPoint, Response } from '../types';
 
 export interface PriceHistoryParams {
   range?: 'month' | 'quarter' | 'year' | 'all';
@@ -17,6 +17,16 @@ export class CardsResource {
   /** GET /cards/{id}/prices — one row per printing */
   prices(id: number, params: { printing?: string } = {}): Promise<Response<Price[]>> {
     return this.client.request<Price[]>('GET', `/cards/${id}/prices`, params);
+  }
+
+  /**
+   * GET /cards/{id}/prices/conditions — per-condition price floors (Pro+).
+   * One row per (printing, condition) pair from live TCGPlayer listings.
+   * Rows older than 24h trigger a live refresh within a daily per-account
+   * quota; over quota, stale rows are served with `meta.stale: true`.
+   */
+  conditions(id: number, params: { printing?: string } = {}): Promise<Response<ConditionPrice[], ConditionMeta>> {
+    return this.client.request<ConditionPrice[]>('GET', `/cards/${id}/prices/conditions`, params) as Promise<Response<ConditionPrice[], ConditionMeta>>;
   }
 
   /** GET /cards/tcgplayer/{tcgplayerId} — lookup with all printings nested */
