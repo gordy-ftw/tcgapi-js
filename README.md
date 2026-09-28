@@ -124,6 +124,19 @@ for (const m of movers.data) {
 }
 ```
 
+### How old is a market price?
+
+Every price row carries `market_price_as_of`: the UTC date TCGPlayer last reported
+that printing's market price. It is older than `last_updated_at` when a printing
+has stopped selling — the last price is kept and dated rather than dropped.
+
+```ts
+const prices = await tcg.cards.prices(123456);
+for (const p of prices.data) {
+  console.log(p.printing, p.market_price, 'as of', p.market_price_as_of);
+}
+```
+
 ### Price history (Hobby+)
 
 ```ts

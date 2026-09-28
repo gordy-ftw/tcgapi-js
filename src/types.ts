@@ -49,6 +49,8 @@ export interface Price {
   card_id: number;
   printing: string | null;
   market_price: number | null;
+  /** UTC date (YYYY-MM-DD) TCGPlayer last reported this market price. Older than the other fields when the printing has had no market price recently (the last price is kept). Null when market_price is null/0 or none was reported in the past year. Absent on API versions before 2026-09. */
+  market_price_as_of?: string | null;
   low_price: number | null;
   median_price: number | null;
   lowest_with_shipping: number | null;
@@ -77,6 +79,8 @@ export interface CardWithPrice {
   total_listings: number | null;
   printing: string | null;
   market_price: number | null;
+  /** UTC date (YYYY-MM-DD) TCGPlayer last reported this market price. Older than the other fields when the printing has had no market price recently (the last price is kept). Null when market_price is null/0 or none was reported in the past year. Absent on API versions before 2026-09. */
+  market_price_as_of?: string | null;
   low_price: number | null;
   median_price: number | null;
   lowest_with_shipping: number | null;
@@ -98,6 +102,8 @@ export interface PriceMover {
   game_slug: string;
   printing: string | null;
   market_price: number;
+  /** UTC date (YYYY-MM-DD) TCGPlayer last reported this market price. Older than the other fields when the printing has had no market price recently (the last price is kept). Null when market_price is null/0 or none was reported in the past year. Absent on API versions before 2026-09. */
+  market_price_as_of?: string | null;
   price_change: number;
   last_updated_at: string;
   image_url: string | null;
@@ -111,6 +117,8 @@ export interface BulkPriceRow {
   foil_only: number;
   printing: string | null;
   market_price: number | null;
+  /** UTC date (YYYY-MM-DD) TCGPlayer last reported this market price. Older than the other fields when the printing has had no market price recently (the last price is kept). Null when market_price is null/0 or none was reported in the past year. Absent on API versions before 2026-09. */
+  market_price_as_of?: string | null;
   low_price: number | null;
   median_price: number | null;
   lowest_with_shipping: number | null;
