@@ -137,6 +137,30 @@ for (const p of prices.data) {
 }
 ```
 
+### Identify a card from a photo
+
+`identify.photo()` reads one photo of a card, slab or sealed product and returns ranked
+catalog candidates. It uses one **scan** per photo, separate from your daily request
+limit: every account gets 25 free scans, then prepaid packs from the dashboard.
+
+```ts
+import { readFile } from 'node:fs/promises';
+
+const result = await tcg.identify.photo(await readFile('card.jpg'), { includePrices: true });
+const { status, candidates, read } = result.data;
+if (status === 'matched') {
+  console.log(candidates[0].name, candidates[0].set.name, candidates[0].prices);
+} else if (status === 'retake') {
+  console.log('Retake:', result.data.message);
+} else {
+  // ambiguous / not_found / unsupported: show candidates and let the user pick
+}
+console.log('scans left:', result.meta?.scans_remaining);
+```
+
+Accepts a `Blob`/`File`, raw bytes (`Uint8Array`, `Buffer`, `ArrayBuffer`) or a base64
+string / data URL. A `402` with code `SCAN_BALANCE_EMPTY` means the balance is used up.
+
 ### Price history (Hobby+)
 
 ```ts

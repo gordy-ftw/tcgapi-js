@@ -9,6 +9,7 @@ import { BulkResource } from './resources/bulk';
 import { ExportResource } from './resources/export';
 import { KeysResource } from './resources/keys';
 import { UsageResource } from './resources/usage';
+import { IdentifyResource } from './resources/identify';
 
 export interface TCGApiOptions {
   /** API key from https://tcgapi.dev/dashboard. Format: tcg_live_... */
@@ -42,6 +43,7 @@ export class TCGApi {
   readonly export: ExportResource;
   readonly keys: KeysResource;
   readonly usage: UsageResource;
+  readonly identify: IdentifyResource;
 
   constructor(options: TCGApiOptions = {}) {
     this.apiKey = options.apiKey ?? (typeof process !== 'undefined' ? process.env?.TCGAPI_KEY : undefined);
@@ -61,10 +63,16 @@ export class TCGApi {
     this.export = new ExportResource(this);
     this.keys = new KeysResource(this);
     this.usage = new UsageResource(this);
+    this.identify = new IdentifyResource(this);
   }
 
   /** @internal */
-  async request<T>(method: string, path: string, query?: Record<string, unknown> | object): Promise<TcgResponse<T>> {
+  async request<T>(
+    method: string,
+    path: string,
+    query?: Record<string, unknown> | object,
+    init?: { body?: BodyInit; timeoutMs?: number },
+  ): Promise<TcgResponse<T>> {
     const url = new URL(this.baseUrl + path);
     if (query) {
       for (const [k, v] of Object.entries(query as Record<string, unknown>)) {
@@ -78,11 +86,11 @@ export class TCGApi {
     if (this.userAgent) headers['User-Agent'] = this.userAgent;
 
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+    const timer = setTimeout(() => controller.abort(), init?.timeoutMs ?? this.timeoutMs);
 
     let resp: globalThis.Response;
     try {
-      resp = await this.fetchImpl(url.toString(), { method, headers, signal: controller.signal });
+      resp = await this.fetchImpl(url.toString(), { method, headers, body: init?.body, signal: controller.signal });
     } finally {
       clearTimeout(timer);
     }

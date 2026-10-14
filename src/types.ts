@@ -226,11 +226,85 @@ export interface UsageResponse {
     plan: string;
     status: string;
   };
+  /** Photo identification scans (POST /v1/identify), billed apart from the daily quota */
+  scans?: { balance: number; trial_pending: boolean };
 }
 
 // Wrapper returned by every list/detail call. Lets callers reach `meta` and `rateLimit`
 // without losing access to the typed payload. The second parameter overrides the meta
 // shape for endpoints with a non-standard meta (e.g. per-condition prices).
+export interface IdentifyCandidate {
+  card_id: number;
+  tcgplayer_id: number | null;
+  name: string;
+  number: string | null;
+  rarity: string | null;
+  product_type: string | null;
+  set: { id: number; name: string; code: string | null };
+  game: { slug: string; name: string };
+  image_url: string | null;
+  match: {
+    /** partial = the same number with the set total on one side only (169/249 vs 169) */
+    number: 'exact' | 'partial' | 'unknown';
+    /** Share of the read name's words in the card name (0-1) */
+    name: number;
+    /** How well the read set agrees with the card's set (0-1) */
+    set: number;
+    /** false when the card's title names an edition stamp the photo doesn't show, or the reverse */
+    edition: boolean | null;
+  };
+  printings: string[];
+  /** The printing the photo points to (finish, 1st Edition stamp), when it decides one */
+  suggested_printing: string | null;
+  score: number;
+  /** Only on the first candidate, with include: 'prices' */
+  prices?: Array<{
+    printing: string;
+    market_price: number | null;
+    low_price: number | null;
+    median_price: number | null;
+    lowest_with_shipping: number | null;
+    price_change_7d: number | null;
+    price_change_30d: number | null;
+    last_updated_at: string | null;
+  }>;
+}
+
+export interface IdentifyResult {
+  id: string;
+  /**
+   * matched: exactly one catalog card fits everything the photo shows (candidates[0]).
+   * ambiguous: several fit. retake: photo not good enough (see message; candidates are hints).
+   * not_found: nothing matches. unsupported: game or language not in the catalog.
+   */
+  status: 'matched' | 'ambiguous' | 'retake' | 'not_found' | 'unsupported';
+  message: string | null;
+  /** What the photo shows. Empty fields are unreadable, never guessed. */
+  read: {
+    game: string;
+    name: string | null;
+    number: string | null;
+    set: string | null;
+    language: string | null;
+    kind: 'raw' | 'slab' | 'sealed' | 'unknown';
+    product_type: string | null;
+    finish: 'non_holo' | 'holo' | 'reverse_holo' | 'unknown';
+    /** The edition mark seen; null when clearly none; 'unclear' when hidden */
+    stamp: string | null;
+    grade: { company: string | null; grade: string | null } | null;
+    readable: { name: boolean; number: boolean; set: boolean };
+    notes: string | null;
+  } | null;
+  candidates: IdentifyCandidate[];
+  warnings: string[];
+}
+
+export interface IdentifyMeta {
+  charged: 'scan' | 'x402';
+  /** Scans left after this one (API-key requests) */
+  scans_remaining?: number;
+}
+
 export interface Response<T, M = Meta> {
   data: T;
   meta?: M;

@@ -79,3 +79,24 @@ test('bulk.conditions returns rows (Pro+; TierError below)', { skip: !hasKey }, 
     assert.ok(err instanceof TierError, 'expected TierError for sub-Pro keys');
   }
 });
+
+// Base Set Charizard (TCGPlayer 42382), TCGPlayer's own product photo.
+async function charizardPhoto() {
+  const r = await fetch('https://product-images.tcgplayer.com/fit-in/1000x1000/42382.jpg');
+  return new Uint8Array(await r.arrayBuffer());
+}
+
+test('identify.photo without key: the photo is accepted, then x402 asks for payment (402)', { skip: hasKey }, async () => {
+  // A malformed upload would be a 400 INVALID_IMAGE; reaching the 402 offer proves the multipart body is right.
+  const err = await new TCGApi().identify.photo(await charizardPhoto()).then(() => null, (e) => e);
+  assert.ok(err instanceof TcgApiError, 'typed error');
+  assert.equal(err.status, 402);
+});
+
+test('identify.photo reads a card (uses one scan)', { skip: !hasKey }, async () => {
+  const resp = await tcg.identify.photo(await charizardPhoto(), { game: 'pokemon', includePrices: true });
+  assert.equal(resp.data.candidates[0].tcgplayer_id, 42382);
+  assert.ok(Array.isArray(resp.data.candidates[0].prices));
+  assert.equal(resp.meta?.charged, 'scan');
+  assert.equal(typeof resp.meta?.scans_remaining, 'number');
+});
