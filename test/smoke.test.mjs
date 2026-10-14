@@ -100,3 +100,12 @@ test('identify.photo reads a card (uses one scan)', { skip: !hasKey }, async () 
   assert.equal(resp.meta?.charged, 'scan');
   assert.equal(typeof resp.meta?.scans_remaining, 'number');
 });
+
+test('identify.usage returns the balance and 30 days without using a scan', { skip: !hasKey }, async () => {
+  const a = await tcg.identify.usage();
+  const b = await tcg.identify.usage();
+  assert.equal(a.data.days.length, 30);
+  assert.equal(typeof a.data.balance, 'number');
+  assert.equal(b.data.balance, a.data.balance, 'reading usage takes no scan');
+  assert.ok(Array.isArray(a.data.ledger));
+});

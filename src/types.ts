@@ -305,6 +305,36 @@ export interface IdentifyMeta {
   scans_remaining?: number;
 }
 
+/** GET /identify/usage: one UTC day of scans, by outcome */
+export interface ScanDay {
+  date: string;
+  /** Scans used that day */
+  scans: number;
+  /** Reads that failed on the reader's side and were refunded */
+  refunded: number;
+  matched: number;
+  ambiguous: number;
+  retake: number;
+  not_found: number;
+  unsupported: number;
+}
+
+export interface ScanLedgerEntry {
+  reason: 'trial' | 'purchase';
+  scans: number;
+  amount_cents: number | null;
+  created_at: string;
+}
+
+export interface ScanUsage {
+  balance: number;
+  trial_pending: boolean;
+  /** The last 30 days, oldest first, including days with no scans */
+  days: ScanDay[];
+  /** Trial and pack purchases added to the balance, newest first (up to 50) */
+  ledger: ScanLedgerEntry[];
+}
+
 export interface Response<T, M = Meta> {
   data: T;
   meta?: M;

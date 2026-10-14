@@ -29,6 +29,9 @@ export type {
   IdentifyResult,
   IdentifyCandidate,
   IdentifyMeta,
+  ScanDay,
+  ScanLedgerEntry,
+  ScanUsage,
 } from './types';
 export type { IdentifyImage, IdentifyOptions } from './resources/identify';
 export type { ListSetsParams, ListSetCardsParams } from './resources/sets';

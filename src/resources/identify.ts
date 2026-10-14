@@ -1,5 +1,5 @@
 import type { TCGApi } from '../client';
-import type { IdentifyMeta, IdentifyResult, Response } from '../types';
+import type { IdentifyMeta, IdentifyResult, Response, ScanUsage } from '../types';
 
 /** A photo: a Blob/File, raw bytes (Uint8Array, Buffer, ArrayBuffer), or a base64 string or data URL. JPEG, PNG or WebP, up to 8 MB. */
 export type IdentifyImage = Blob | ArrayBuffer | Uint8Array | string;
@@ -39,5 +39,13 @@ export class IdentifyResource {
     return this.client.request<IdentifyResult>('POST', '/identify', query, { body: form, timeoutMs: IDENTIFY_TIMEOUT }) as unknown as Promise<
       Response<IdentifyResult, IdentifyMeta>
     >;
+  }
+
+  /**
+   * GET /identify/usage — scan balance, scans per day for the last 30 days by outcome,
+   * and the trial/purchase ledger. Free: uses no scan and no daily quota.
+   */
+  usage(): Promise<Response<ScanUsage>> {
+    return this.client.request<ScanUsage>('GET', '/identify/usage');
   }
 }

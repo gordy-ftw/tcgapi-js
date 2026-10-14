@@ -161,6 +161,14 @@ console.log('scans left:', result.meta?.scans_remaining);
 Accepts a `Blob`/`File`, raw bytes (`Uint8Array`, `Buffer`, `ArrayBuffer`) or a base64
 string / data URL. A `402` with code `SCAN_BALANCE_EMPTY` means the balance is used up.
 
+`identify.usage()` returns the balance, scans per day for the last 30 days by outcome and
+the trial and pack purchases. It is free: no scan, no daily quota.
+
+```ts
+const { data } = await tcg.identify.usage();
+console.log(data.balance, data.days.at(-1)); // { date, scans, matched, ambiguous, retake, ... }
+```
+
 ### Price history (Hobby+)
 
 ```ts
