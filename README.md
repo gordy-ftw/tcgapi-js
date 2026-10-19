@@ -137,6 +137,20 @@ for (const p of prices.data) {
 }
 ```
 
+### Products TCGPlayer no longer prices
+
+When TCGPlayer stops reporting any price for a product (typically out of print with
+no listings), its rows keep the last prices reported and are no longer refreshed
+daily. `no_market_price_since` says since when; it is `null` while the printing is
+priced.
+
+```ts
+const prices = await tcg.cards.prices(123456);
+for (const p of prices.data) {
+  if (p.no_market_price_since) console.log(p.printing, 'unpriced on TCGPlayer since', p.no_market_price_since);
+}
+```
+
 ### Identify a card from a photo
 
 `identify.photo()` reads one photo of a card, slab or sealed product and returns ranked

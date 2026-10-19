@@ -59,6 +59,8 @@ export interface Price {
   price_change_7d: number | null;
   price_change_30d: number | null;
   last_updated_at: string;
+  /** Set (ISO 8601, UTC) when TCGPlayer has priced nothing for this product since then — typically out of print with no listings. The row keeps the last prices TCGPlayer reported and is not refreshed daily, so last_updated_at stays at the last real update. Null while the printing is priced. Absent on API versions before 2026-10. */
+  no_market_price_since?: string | null;
   /** Copies sold in the latest enriched month window. Pro/Business tiers only — absent below Pro. */
   sales_volume?: number | null;
   /** Average sale price over the same window. Pro/Business tiers only — absent below Pro. */
@@ -85,6 +87,8 @@ export interface CardWithPrice {
   median_price: number | null;
   lowest_with_shipping: number | null;
   price_updated_at: string | null;
+  /** Set (ISO 8601, UTC) when TCGPlayer has priced nothing for this product since then — typically out of print with no listings. The row keeps the last prices TCGPlayer reported and is not refreshed daily, so last_updated_at stays at the last real update. Null while the printing is priced. Absent on API versions before 2026-10. */
+  no_market_price_since?: string | null;
   image_url: string | null;
   game_name?: string;
   game_slug?: string;
@@ -106,6 +110,8 @@ export interface PriceMover {
   market_price_as_of?: string | null;
   price_change: number;
   last_updated_at: string;
+  /** Set (ISO 8601, UTC) when TCGPlayer has priced nothing for this product since then — typically out of print with no listings. The row keeps the last prices TCGPlayer reported and is not refreshed daily, so last_updated_at stays at the last real update. Null while the printing is priced. Absent on API versions before 2026-10. */
+  no_market_price_since?: string | null;
   image_url: string | null;
 }
 
@@ -127,6 +133,8 @@ export interface BulkPriceRow {
   price_change_7d: number | null;
   price_change_30d: number | null;
   last_updated_at: string | null;
+  /** Set (ISO 8601, UTC) when TCGPlayer has priced nothing for this product since then — typically out of print with no listings. The row keeps the last prices TCGPlayer reported and is not refreshed daily, so last_updated_at stays at the last real update. Null while the printing is priced. Absent on API versions before 2026-10. */
+  no_market_price_since?: string | null;
   image_url: string | null;
 }
 
@@ -267,6 +275,8 @@ export interface IdentifyCandidate {
     price_change_7d: number | null;
     price_change_30d: number | null;
     last_updated_at: string | null;
+    /** See Price.no_market_price_since. */
+    no_market_price_since?: string | null;
   }>;
 }
 
