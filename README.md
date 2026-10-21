@@ -151,6 +151,23 @@ for (const p of prices.data) {
 }
 ```
 
+### eBay sold prices (Pro+)
+
+`include: 'ebay'` adds an `ebay` field to each printing: the 30-day median eBay sold price
+for ungraded copies plus a `graded` map keyed by grade (`"PSA 10"`, `"BGS 9.5"`, ...), or
+`null` when there is no eBay data. `'ebay_sales'` also returns the sold listings. Costs 2
+credits (`meta.credits_consumed`); below Pro it throws `TierError`.
+
+```ts
+const prices = await tcg.cards.prices(123456, { include: 'ebay' });
+for (const p of prices.data) {
+  console.log(p.printing, p.ebay?.median_30d, p.ebay?.graded['PSA 10']?.median_30d);
+}
+
+// Daily 30-day eBay median alongside the TCGPlayer history
+const history = await tcg.cards.history(123456, { range: 'year', include: 'ebay' });
+```
+
 ### Identify a card from a photo
 
 `identify.photo()` reads one photo of a card, slab or sealed product and returns ranked
