@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.0
+
+- `days` and `graded_days` on `EbaySummary` (card prices, bulk prices, identify prices)
+  and `EbayHistoryPoint`: how many of the 30 window days the stored ungraded / graded
+  eBay sales cover (30 = complete; lower in the first month after a card's eBay
+  tracking starts). Optional: `undefined` on older responses; on history points
+  `graded_days` is absent when `graded` is null.
+- `EbayHistoryPoint.graded` can now be `null` (graded sales not yet complete that day).
+
 ## 0.8.0
 
 - `include: 'ebay'` on `bulk.prices()`, Pro and up: adds `ebay` (`EbaySummary` without

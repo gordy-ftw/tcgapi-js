@@ -159,6 +159,8 @@ for (const p of prices.data) {
 for ungraded copies plus a `graded` map keyed by grade (`"PSA 10"`, `"BGS 9.5"`, ...), or
 `null` when there is no eBay data. `'ebay_sales'` also returns the sold listings. Costs 2
 credits (`meta.credits_consumed`); below Pro it throws `TierError`.
+`ebay.days` / `ebay.graded_days` say how many of the 30 window days the figures cover
+(30 = complete; lower in a card's first month of eBay tracking).
 
 ```ts
 const prices = await tcg.cards.prices(123456, { include: 'ebay' });
