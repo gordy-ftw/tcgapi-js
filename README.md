@@ -90,6 +90,8 @@ if (surgingSparks) {
 // Auto-chunks if you pass more than 500 IDs.
 const bulk = await tcg.bulk.prices([1, 2, 3, /* ... up to thousands */]);
 console.log(`Got prices for ${bulk.data.length} card-printings`);
+// include: 'ebay' adds each row's eBay summary (1 credit + 1 per card with eBay data)
+const withEbay = await tcg.bulk.prices([1, 2, 3], { include: 'ebay' });
 ```
 
 ### Per-condition prices (Pro+)
@@ -191,6 +193,8 @@ console.log('scans left:', result.meta?.scans_remaining);
 
 Accepts a `Blob`/`File`, raw bytes (`Uint8Array`, `Buffer`, `ArrayBuffer`) or a base64
 string / data URL. A `402` with code `SCAN_BALANCE_EMPTY` means the balance is used up.
+`includeEbay: true` adds the prices with each printing's eBay sold prices (`ebay`, and on a
+graded slab `ebay.slab_grade` for the grade on the label), on every plan at no extra charge.
 
 `identify.usage()` returns the balance, scans per day for the last 30 days by outcome and
 the trial and pack purchases. It is free: no scan, no daily quota.

@@ -9,6 +9,8 @@ export interface IdentifyOptions {
   game?: string;
   /** Add the top candidate's current prices (no extra charge). */
   includePrices?: boolean;
+  /** Add the top candidate's prices with each printing's eBay sold prices (implies includePrices; no extra charge). */
+  includeEbay?: boolean;
 }
 
 // A read can take up to ~45s (one retry on a busy model host).
@@ -35,7 +37,7 @@ export class IdentifyResource {
     } else {
       form.append('image', new Blob([image as BlobPart]), 'photo');
     }
-    const query = { game: options.game, include: options.includePrices ? 'prices' : undefined };
+    const query = { game: options.game, include: options.includeEbay ? 'ebay' : options.includePrices ? 'prices' : undefined };
     return this.client.request<IdentifyResult>('POST', '/identify', query, { body: form, timeoutMs: IDENTIFY_TIMEOUT }) as unknown as Promise<
       Response<IdentifyResult, IdentifyMeta>
     >;

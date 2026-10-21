@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.0
+
+- `include: 'ebay'` on `bulk.prices()`, Pro and up: adds `ebay` (`EbaySummary` without
+  `sales`, or `null`) to each `BulkPriceRow`. Costs 1 credit plus 1 per card with eBay
+  data (`meta.credits_consumed`, summed across auto-chunked calls). Below Pro the API
+  answers 403 `TIER_REQUIRED` (`TierError`).
+- `includeEbay` on `identify.photo()` (implies `includePrices`; every plan, no extra
+  charge): adds `ebay` to each of the top candidate's `prices`, and on a graded slab
+  `ebay.slab_grade` (`EbayStats` plus the grade `label`) for the grade on the label.
+
 ## 0.7.0
 
 - `include` on `cards.prices()` (`'ebay'` | `'ebay_sales'`) and `cards.history()` (`'ebay'`),
