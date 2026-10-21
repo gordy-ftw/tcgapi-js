@@ -84,8 +84,12 @@ export interface EbayStats {
 
 /** eBay sold listings for one printing. Top-level figures are ungraded copies of every condition. */
 export interface EbaySummary extends EbayStats {
+  /** How many of the 30 window days the stored ungraded sales cover (30 = complete; lower in the first month of tracking). */
+  days?: number;
   /** Every grade that has sold, keyed by label ("PSA 10", "CGC 10 Pristine", "BGS 9.5"). */
   graded: Record<string, EbayStats>;
+  /** The same as `days` for graded sales, which start being tracked on their own date. */
+  graded_days?: number;
   /** Date the sales were last read. The 30-day window ends here. */
   as_of: string;
   /** Only with `include: 'ebay_sales'`: the included sales in the 30-day window, newest first. */
@@ -113,7 +117,12 @@ export interface EbaySale {
 export interface EbayHistoryPoint {
   median_30d: number | null;
   sales_30d: number;
-  graded: Record<string, { median_30d: number | null; sales_30d: number }>;
+  /** How many of that day's 30 window days the stored ungraded sales cover (30 = complete). */
+  days?: number;
+  /** Null when graded sales were not yet complete on that day. */
+  graded: Record<string, { median_30d: number | null; sales_30d: number }> | null;
+  /** The same as `days` for graded sales. Absent when graded is null. */
+  graded_days?: number;
 }
 
 export interface CardWithPrice {
