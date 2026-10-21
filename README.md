@@ -173,6 +173,9 @@ for (const p of prices.data) {
 const history = await tcg.cards.history(123456, { range: 'year', include: 'ebay' });
 ```
 
+Which cards have eBay data: `tcg.ebay.coverage()` (per game) or `tcg.ebay.coverage({ game: 'pokemon' })`
+(per set). Public: no key needed, not counted against quota.
+
 ### Identify a card from a photo
 
 `identify.photo()` reads one photo of a card, slab or sealed product and returns ranked

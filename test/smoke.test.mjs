@@ -30,6 +30,25 @@ test('games.sets returns sets for Pokemon', async () => {
   assert.ok(resp.data[0].id);
 });
 
+test('ebay.coverage returns totals and games (public)', async () => {
+  const resp = await tcg.ebay.coverage();
+  assert.ok(resp.data.totals.cards_with_ebay > 0);
+  assert.ok(resp.data.games.length > 0);
+  assert.ok(resp.data.games[0].slug);
+  assert.equal(typeof resp.data.games[0].refresh['3d'], 'number');
+});
+
+test('ebay.coverage for Pokemon returns sets', async () => {
+  const resp = await tcg.ebay.coverage({ game: 'pokemon' });
+  assert.equal(resp.data.slug, 'pokemon');
+  assert.ok(resp.data.sets.length > 0);
+  assert.ok(resp.data.sets[0].set_id);
+});
+
+test('ebay.coverage throws NotFoundError for a game without eBay data', async () => {
+  await assert.rejects(() => tcg.ebay.coverage({ game: 'definitely-not-a-real-game-xyz' }), NotFoundError);
+});
+
 test('search.cards returns matches (requires key or returns 402)', { skip: !hasKey }, async () => {
   const resp = await tcg.search.cards({ q: 'charizard', per_page: 5 });
   assert.ok(resp.data.length > 0, 'expected charizard results');

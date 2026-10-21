@@ -10,6 +10,7 @@ import { ExportResource } from './resources/export';
 import { KeysResource } from './resources/keys';
 import { UsageResource } from './resources/usage';
 import { IdentifyResource } from './resources/identify';
+import { EbayResource } from './resources/ebay';
 
 export interface TCGApiOptions {
   /** API key from https://tcgapi.dev/dashboard. Format: tcg_live_... */
@@ -44,6 +45,7 @@ export class TCGApi {
   readonly keys: KeysResource;
   readonly usage: UsageResource;
   readonly identify: IdentifyResource;
+  readonly ebay: EbayResource;
 
   constructor(options: TCGApiOptions = {}) {
     this.apiKey = options.apiKey ?? (typeof process !== 'undefined' ? process.env?.TCGAPI_KEY : undefined);
@@ -64,6 +66,7 @@ export class TCGApi {
     this.keys = new KeysResource(this);
     this.usage = new UsageResource(this);
     this.identify = new IdentifyResource(this);
+    this.ebay = new EbayResource(this);
   }
 
   /** @internal */
