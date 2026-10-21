@@ -4,6 +4,8 @@ import type { BulkCard, Card, ConditionMeta, ConditionPrice, Price, PriceHistory
 export interface PriceHistoryParams {
   range?: 'month' | 'quarter' | 'year' | 'all';
   printing?: string;
+  /** `'ebay'` adds each day's 30-day eBay sold median to each row. Pro+; costs 2 credits. */
+  include?: 'ebay';
 }
 
 export class CardsResource {
@@ -14,8 +16,12 @@ export class CardsResource {
     return this.client.request<Card>('GET', `/cards/${id}`);
   }
 
-  /** GET /cards/{id}/prices — one row per printing */
-  prices(id: number, params: { printing?: string } = {}): Promise<Response<Price[]>> {
+  /**
+   * GET /cards/{id}/prices — one row per printing.
+   * `include: 'ebay'` adds an `ebay` summary of eBay sold prices to each row; `'ebay_sales'` also adds the
+   * sold listings behind it. Pro+; costs 2 credits.
+   */
+  prices(id: number, params: { printing?: string; include?: 'ebay' | 'ebay_sales' } = {}): Promise<Response<Price[]>> {
     return this.client.request<Price[]>('GET', `/cards/${id}/prices`, params);
   }
 

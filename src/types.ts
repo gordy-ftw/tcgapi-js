@@ -67,6 +67,51 @@ export interface Price {
   avg_sales_price?: number | null;
   /** Date of the sales snapshot. Pro/Business tiers only — absent below Pro. */
   sales_as_of?: string | null;
+  /** eBay sold prices for this printing. Only with `include: 'ebay'` or `'ebay_sales'` (Pro+, 2 credits); null when there is no eBay data for the printing. */
+  ebay?: EbaySummary | null;
+}
+
+/** eBay sold-price figures for one printing (ungraded) or one grade. */
+export interface EbayStats {
+  /** Median sold price in the 30 days before as_of. Null when nothing sold in the window. */
+  median_30d: number | null;
+  /** Sales the median rests on. */
+  sales_30d: number;
+  /** Latest sale, in or out of the window. On a Best Offer sale, the accepted offer. */
+  last_price: number | null;
+  last_sold: string | null;
+}
+
+/** eBay sold listings for one printing. Top-level figures are ungraded copies of every condition. */
+export interface EbaySummary extends EbayStats {
+  /** Every grade that has sold, keyed by label ("PSA 10", "CGC 10 Pristine", "BGS 9.5"). */
+  graded: Record<string, EbayStats>;
+  /** Date the sales were last read. The 30-day window ends here. */
+  as_of: string;
+  /** Only with `include: 'ebay_sales'`: the included sales in the 30-day window, newest first. */
+  sales?: EbaySale[];
+}
+
+export interface EbaySale {
+  sold_date: string;
+  /** Sold price; on a Best Offer sale, the accepted offer. */
+  price: number;
+  best_offer: boolean;
+  /** Asking price, on Best Offer sales. */
+  list_price: number | null;
+  /** Grade label (e.g. "PSA 10"); null = ungraded. */
+  grade: string | null;
+  /** Ungraded sales only, when the title states one (Near Mint … Damaged). */
+  condition: string | null;
+  title: string;
+  url: string;
+}
+
+/** eBay sold median for the 30 days up to a history row's date. `graded` lists only grades with a sale in that window. */
+export interface EbayHistoryPoint {
+  median_30d: number | null;
+  sales_30d: number;
+  graded: Record<string, { median_30d: number | null; sales_30d: number }>;
 }
 
 export interface CardWithPrice {
@@ -183,6 +228,8 @@ export interface PriceHistoryPoint {
   low_price: number | null;
   avg_sales_price: number | null;
   sales_volume: number | null;
+  /** Only with `include: 'ebay'` on cards.history (Pro+, 2 credits). Null before eBay sales for the printing are complete, or when there is no eBay data. */
+  ebay?: EbayHistoryPoint | null;
 }
 
 export interface Meta {
@@ -190,6 +237,8 @@ export interface Meta {
   page?: number;
   per_page?: number;
   has_more?: boolean;
+  /** 2 on requests with an eBay `include`; absent otherwise. */
+  credits_consumed?: number;
 }
 
 export interface RateLimit {
