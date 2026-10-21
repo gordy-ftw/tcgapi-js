@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.11.0
+
+- `ebay.coverage()` (`GET /v1/ebay/coverage`): how many cards and printings have eBay sold
+  prices, per game, with coverage percentage, newest read and refresh cadence
+  (`EbayCoverage`). `ebay.coverage({ game })` returns that game with per-set coverage
+  (`EbayGameCoverage`); `NotFoundError` when the game has no eBay data. Public: no key
+  needed, not counted against quota. New types `EbayCoverage`, `EbayGameCoverage`,
+  `EbayCoverageGame`, `EbayCoverageSet`.
+
 ## 0.10.0
 
 - `as_of` on `EbayHistoryPoint` (`cards.history()` with `include: 'ebay'`): present only on

@@ -202,6 +202,43 @@ export interface BulkCard extends Card {
   prices: Price[];
 }
 
+/** GET /ebay/coverage: eBay sold-price coverage for one game. */
+export interface EbayCoverageGame {
+  /** Game name */
+  game: string;
+  slug: string;
+  cards: number;
+  cards_with_ebay: number;
+  coverage_pct: number;
+  printings_with_ebay: number;
+  /** Date of the newest eBay read in this game (YYYY-MM-DD). */
+  newest_as_of: string;
+  /** Cards with eBay data by how often their sales are re-read. */
+  refresh: { daily: number; '3d': number; weekly: number; monthly: number };
+}
+
+export interface EbayCoverageSet {
+  set_id: number;
+  /** Set name */
+  set: string;
+  cards: number;
+  cards_with_ebay: number;
+  coverage_pct: number;
+}
+
+/** GET /ebay/coverage without `game`. */
+export interface EbayCoverage {
+  totals: { cards_with_ebay: number; printings_with_ebay: number; games: number };
+  games: EbayCoverageGame[];
+  computed_at: string;
+}
+
+/** GET /ebay/coverage?game={slug}: the game plus per-set coverage. */
+export interface EbayGameCoverage extends EbayCoverageGame {
+  sets: EbayCoverageSet[];
+  computed_at: string;
+}
+
 export interface ConditionPrice {
   card_id: number;
   printing: string;
