@@ -123,6 +123,8 @@ export interface EbayHistoryPoint {
   graded: Record<string, { median_30d: number | null; sales_30d: number }> | null;
   /** The same as `days` for graded sales. Absent when graded is null. */
   graded_days?: number;
+  /** Only on days after the card's latest eBay read: those days carry that read's figures, and this is its date (YYYY-MM-DD). */
+  as_of?: string;
 }
 
 export interface CardWithPrice {
