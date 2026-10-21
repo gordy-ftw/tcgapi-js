@@ -18,20 +18,24 @@ export class BulkResource {
    * GET /bulk/prices — up to 500 cards per call. Pro+ tier.
    * Returns one row per (card, printing) — a card with N printings yields N rows.
    * For larger lists this method auto-chunks and concatenates.
+   * `include: 'ebay'` adds each row's eBay summary (no sales); costs 1 credit plus 1 per card with eBay data.
    */
-  async prices(ids: number[]): Promise<Response<BulkPriceRow[]>> {
+  async prices(ids: number[], params: { include?: 'ebay' } = {}): Promise<Response<BulkPriceRow[]>> {
     if (ids.length <= BULK_PRICES_MAX) {
-      return this.client.request<BulkPriceRow[]>('GET', '/bulk/prices', { ids: joinIds(ids) });
+      return this.client.request<BulkPriceRow[]>('GET', '/bulk/prices', { ids: joinIds(ids), ...params });
     }
     const all: BulkPriceRow[] = [];
     let lastRateLimit;
+    let credits: number | undefined;
     for (let i = 0; i < ids.length; i += BULK_PRICES_MAX) {
       const chunk = ids.slice(i, i + BULK_PRICES_MAX);
-      const resp = await this.client.request<BulkPriceRow[]>('GET', '/bulk/prices', { ids: joinIds(chunk) });
+      const resp = await this.client.request<BulkPriceRow[]>('GET', '/bulk/prices', { ids: joinIds(chunk), ...params });
       all.push(...resp.data);
       lastRateLimit = resp.rateLimit;
+      if (resp.meta?.credits_consumed !== undefined) credits = (credits ?? 0) + resp.meta.credits_consumed;
     }
-    return { data: all, meta: { total: all.length }, rateLimit: lastRateLimit };
+    const meta = credits === undefined ? { total: all.length } : { total: all.length, credits_consumed: credits };
+    return { data: all, meta, rateLimit: lastRateLimit };
   }
 
   /**

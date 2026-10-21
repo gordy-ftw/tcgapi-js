@@ -90,6 +90,8 @@ export interface EbaySummary extends EbayStats {
   as_of: string;
   /** Only with `include: 'ebay_sales'`: the included sales in the 30-day window, newest first. */
   sales?: EbaySale[];
+  /** identify.photo() with `includeEbay` on a graded slab: the eBay figures for the grade on the label. */
+  slab_grade?: (EbayStats & { label: string }) | null;
 }
 
 export interface EbaySale {
@@ -181,6 +183,8 @@ export interface BulkPriceRow {
   /** Set (ISO 8601, UTC) when TCGPlayer has priced nothing for this product since then — typically out of print with no listings. The row keeps the last prices TCGPlayer reported and is not refreshed daily, so last_updated_at stays at the last real update. Null while the printing is priced. Absent on API versions before 2026-10. */
   no_market_price_since?: string | null;
   image_url: string | null;
+  /** Only with `include: 'ebay'` (Pro+): the printing's eBay summary (without sales), or null. */
+  ebay?: EbaySummary | null;
 }
 
 export interface BulkCard extends Card {
@@ -237,7 +241,7 @@ export interface Meta {
   page?: number;
   per_page?: number;
   has_more?: boolean;
-  /** 2 on requests with an eBay `include`; absent otherwise. */
+  /** Credits charged on requests with an eBay `include` (2 on card prices/history; 1 + cards with eBay data on bulk prices); absent otherwise. */
   credits_consumed?: number;
 }
 
@@ -314,7 +318,7 @@ export interface IdentifyCandidate {
   /** The printing the photo points to (finish, 1st Edition stamp), when it decides one */
   suggested_printing: string | null;
   score: number;
-  /** Only on the first candidate, with include: 'prices' */
+  /** Only on the first candidate, with includePrices or includeEbay */
   prices?: Array<{
     printing: string;
     market_price: number | null;
@@ -326,6 +330,8 @@ export interface IdentifyCandidate {
     last_updated_at: string | null;
     /** See Price.no_market_price_since. */
     no_market_price_since?: string | null;
+    /** Only with includeEbay: the printing's eBay summary (without sales; slab_grade on a slab), or null. */
+    ebay?: EbaySummary | null;
   }>;
 }
 
