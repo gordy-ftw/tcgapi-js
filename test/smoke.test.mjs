@@ -105,6 +105,27 @@ async function charizardPhoto() {
   return new Uint8Array(await r.arrayBuffer());
 }
 
+test('cards.supply / supplyHistory / bulk.supply without key return 402 typed errors', { skip: hasKey }, async () => {
+  for (const call of [() => tcg.cards.supply(13118), () => tcg.cards.supplyHistory(13118), () => tcg.bulk.supply([13118])]) {
+    await assert.rejects(call, (err) => err instanceof TcgApiError && err.status === 402);
+  }
+});
+
+test('cards.supply returns listings and a price ladder (Pro+; TierError below)', { skip: !hasKey }, async () => {
+  try {
+    const resp = await tcg.cards.supply(13118);
+    assert.equal(resp.data.card_id, 13118);
+    assert.ok(resp.data.listings >= 0);
+    assert.ok(Array.isArray(resp.data.printings));
+    const history = await tcg.cards.supplyHistory(13118, { days: 30 });
+    assert.ok(Array.isArray(history.data) && history.data.length > 0);
+    const bulk = await tcg.bulk.supply([13118]);
+    assert.deepEqual(bulk.data.map((s) => s.card_id), [13118]);
+  } catch (err) {
+    assert.ok(err instanceof TierError, 'expected TierError for sub-Pro keys');
+  }
+});
+
 test('identify.photo without key: the photo is accepted, then x402 asks for payment (402)', { skip: hasKey }, async () => {
   // A malformed upload would be a 400 INVALID_IMAGE; reaching the 402 offer proves the multipart body is right.
   const err = await new TCGApi().identify.photo(await charizardPhoto()).then(() => null, (e) => e);

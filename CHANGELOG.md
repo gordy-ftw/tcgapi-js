@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.12.0
+
+- `cards.supply(id)` (`GET /v1/cards/{id}/supply`), Pro and up: listing supply for a card
+  or sealed product (`ListingSupply`) — active listings, copies for sale, distinct sellers,
+  the largest listing's share, single-copy listings, listings per condition and printing, a
+  price ladder per printing at 90/100/110/125/150% of its market price (`SupplyLadderStep`),
+  the 110% step across printings (`near_market`), and 30-day sales with days of supply.
+  `meta.as_of` (`SupplyMeta`) is when the listings were read (about every 3 days per
+  product). `NotFoundError` when the card is unknown or has no supply recorded yet.
+- `cards.supplyHistory(id, { days })` (`GET /v1/cards/{id}/supply/history`), Pro and up:
+  one `SupplyHistoryPoint` per day the listings were read, oldest first; `days` 1-3650,
+  default 90. History starts 2026-10-27.
+- `bulk.supply(ids)` (`GET /v1/bulk/supply`), Pro and up: `ListingSupply` for up to 500
+  products per call, auto-chunked above that. Products with no supply recorded yet are
+  absent.
+- New types `ListingSupply`, `SupplyLadderStep`, `SupplyNearMarket`, `SupplyPrinting`,
+  `SupplyMeta`, `SupplyHistoryPoint`.
+
 ## 0.11.0
 
 - `ebay.coverage()` (`GET /v1/ebay/coverage`): how many cards and printings have eBay sold
