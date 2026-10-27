@@ -273,6 +273,100 @@ export interface ConditionMeta {
   condition_counts?: Record<string, number>;
 }
 
+/**
+ * One step of a printing's supply ladder: listings priced at or under `max_pct` of its market price.
+ * Photo (custom) listings are left out — sellers list opened boxes and lots under sealed products.
+ */
+export interface SupplyLadderStep {
+  /** Step as a share of the market price: 0.9, 1, 1.1, 1.25 or 1.5. */
+  max_pct: number;
+  /** Listing price (before shipping) at most this. */
+  max_price: number;
+  listings: number;
+  /** Copies for sale across those listings. */
+  units: number;
+  sellers: number;
+  /** False when only the cheapest 50 listings could be itemised, so listings, units and sellers are lower bounds. */
+  exact: boolean;
+}
+
+/** The 110% ladder step summed over printings (each against its own market price). */
+export interface SupplyNearMarket {
+  listings: number;
+  units: number;
+  /** Summed per printing, so a seller listing two printings counts twice. */
+  sellers: number;
+  /** True only when every printing's 110% step is exact. */
+  exact: boolean;
+}
+
+/** One price ladder per printing that has a market price. */
+export interface SupplyPrinting {
+  printing: string;
+  /** The market price the ladder was measured against, as of last_updated_at. */
+  market_price: number;
+  ladder: SupplyLadderStep[];
+}
+
+/**
+ * GET /cards/{id}/supply and rows of /bulk/supply — how much of a product is for sale on TCGPlayer,
+ * from how many sellers, and how much of it sits near the market price. English listings priced
+ * for US shipping, read about every 3 days per product. Counts only; no seller identities.
+ */
+export interface ListingSupply {
+  card_id: number;
+  name: string;
+  tcgplayer_id: number | null;
+  /** Active listings, all conditions and printings (photo listings included). */
+  listings: number;
+  /** Copies for sale across all listings. */
+  units: number | null;
+  /** Distinct sellers. Null when it could not be counted. */
+  sellers: number | null;
+  /** The listing with the most copies and its share (0-1) of all units. Null when units are unknown or 0. */
+  largest_listing: { quantity: number; share: number } | null;
+  /** Listings with exactly one copy. */
+  single_unit_listings: number | null;
+  /** True when every listing was itemised (not just counted). */
+  complete: boolean;
+  /** The 110% step across printings; `listings: 0` means nobody is selling near the market price. Null when no printing has a market price. */
+  near_market: SupplyNearMarket | null;
+  /** Copies sold over the last 30 days (all printings). */
+  sales_30d: number | null;
+  /** sales_30d divided by the days with recorded sales. Null with fewer than 7 recorded days. */
+  sales_per_day: number | null;
+  /** units / sales_per_day. Null when sales_per_day is null or 0. */
+  days_of_supply: number | null;
+  /** near_market.units / sales_per_day. */
+  near_market_days_of_supply: number | null;
+  /** Listings per condition, e.g. `{ "Near Mint": 40 }`. */
+  by_condition: Record<string, number>;
+  /** Listings per printing, e.g. `{ "Normal": 205 }`. */
+  by_printing: Record<string, number>;
+  printings: SupplyPrinting[];
+  last_updated_at: string;
+}
+
+/** Meta for /cards/{id}/supply. */
+export interface SupplyMeta {
+  /** When the listings were read (same as data.last_updated_at). */
+  as_of?: string;
+}
+
+/** One point of /cards/{id}/supply/history: one per day the listings were read (about every 3 days). History starts 2026-10-27. */
+export interface SupplyHistoryPoint {
+  /** YYYY-MM-DD (UTC). */
+  date: string;
+  listings: number;
+  units: number | null;
+  sellers: number | null;
+  /** The near-market (110%) step; null when no printing had a market price that day. */
+  near_market_listings: number | null;
+  near_market_units: number | null;
+  near_market_sellers: number | null;
+  near_market_exact: boolean | null;
+}
+
 export interface PriceHistoryPoint {
   date: string;
   printing: string | null;

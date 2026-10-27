@@ -1,5 +1,16 @@
 import type { TCGApi } from '../client';
-import type { BulkCard, Card, ConditionMeta, ConditionPrice, Price, PriceHistoryPoint, Response } from '../types';
+import type {
+  BulkCard,
+  Card,
+  ConditionMeta,
+  ConditionPrice,
+  ListingSupply,
+  Price,
+  PriceHistoryPoint,
+  Response,
+  SupplyHistoryPoint,
+  SupplyMeta,
+} from '../types';
 
 export interface PriceHistoryParams {
   range?: 'month' | 'quarter' | 'year' | 'all';
@@ -33,6 +44,24 @@ export class CardsResource {
    */
   conditions(id: number, params: { printing?: string } = {}): Promise<Response<ConditionPrice[], ConditionMeta>> {
     return this.client.request<ConditionPrice[]>('GET', `/cards/${id}/prices/conditions`, params) as Promise<Response<ConditionPrice[], ConditionMeta>>;
+  }
+
+  /**
+   * GET /cards/{id}/supply — listing supply (Pro+): active listings, copies for sale, distinct
+   * sellers, the largest listing's share, a price ladder per printing at 90-150% of market, and
+   * days of supply at the last 30 days' sales rate. Read about every 3 days per product.
+   * NotFoundError when the card is unknown or has no supply recorded yet.
+   */
+  supply(id: number): Promise<Response<ListingSupply, SupplyMeta>> {
+    return this.client.request<ListingSupply>('GET', `/cards/${id}/supply`) as Promise<Response<ListingSupply, SupplyMeta>>;
+  }
+
+  /**
+   * GET /cards/{id}/supply/history — one point per day the listings were read, oldest first (Pro+).
+   * `days`: how far back, 1-3650 (API default 90). History starts 2026-10-27.
+   */
+  supplyHistory(id: number, params: { days?: number } = {}): Promise<Response<SupplyHistoryPoint[]>> {
+    return this.client.request<SupplyHistoryPoint[]>('GET', `/cards/${id}/supply/history`, params);
   }
 
   /** GET /cards/tcgplayer/{tcgplayerId} — lookup with all printings nested */

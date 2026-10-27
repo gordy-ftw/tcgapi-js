@@ -1,10 +1,11 @@
 import type { TCGApi } from '../client';
-import type { BulkCard, BulkConditionRow, BulkPriceRow, PriceHistoryPoint, Response } from '../types';
+import type { BulkCard, BulkConditionRow, BulkPriceRow, ListingSupply, PriceHistoryPoint, Response } from '../types';
 
 const BULK_PRICES_MAX = 500;
 const BULK_CARDS_MAX = 100;
 const BULK_HISTORY_MAX = 50;
 const BULK_CONDITIONS_MAX = 500;
+const BULK_SUPPLY_MAX = 500;
 
 function joinIds(ids: number[]): string {
   if (ids.length === 0) throw new Error('At least one card ID required');
@@ -72,6 +73,26 @@ export class BulkResource {
     for (let i = 0; i < ids.length; i += BULK_CONDITIONS_MAX) {
       const chunk = ids.slice(i, i + BULK_CONDITIONS_MAX);
       const resp = await this.client.request<BulkConditionRow[]>('GET', '/bulk/conditions', { ids: joinIds(chunk) });
+      all.push(...resp.data);
+      lastRateLimit = resp.rateLimit;
+    }
+    return { data: all, meta: { total: all.length }, rateLimit: lastRateLimit };
+  }
+
+  /**
+   * GET /bulk/supply — listing supply (see cards.supply()) for up to 500 cards or sealed
+   * products per call. Pro+ tier. Ordered by card_id within each call; products with no
+   * supply recorded yet are absent from the result. Auto-chunks for larger lists.
+   */
+  async supply(ids: number[]): Promise<Response<ListingSupply[]>> {
+    if (ids.length <= BULK_SUPPLY_MAX) {
+      return this.client.request<ListingSupply[]>('GET', '/bulk/supply', { ids: joinIds(ids) });
+    }
+    const all: ListingSupply[] = [];
+    let lastRateLimit;
+    for (let i = 0; i < ids.length; i += BULK_SUPPLY_MAX) {
+      const chunk = ids.slice(i, i + BULK_SUPPLY_MAX);
+      const resp = await this.client.request<ListingSupply[]>('GET', '/bulk/supply', { ids: joinIds(chunk) });
       all.push(...resp.data);
       lastRateLimit = resp.rateLimit;
     }

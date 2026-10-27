@@ -111,6 +111,23 @@ console.log(conditions.meta?.cached, conditions.meta?.condition_counts);
 const bulkConditions = await tcg.bulk.conditions([13217, 13218, 13219]);
 ```
 
+### Listing supply (Pro+)
+
+```ts
+// How much is for sale, from how many sellers, and how much sits near the market price.
+const supply = await tcg.cards.supply(13118);
+const s = supply.data;
+console.log(`${s.units} copies from ${s.sellers} sellers; largest listing holds ${s.largest_listing?.share}`);
+console.log(`${s.near_market?.units} copies within 10% of market: ${s.near_market_days_of_supply} days of sales`);
+
+// One point per read (about every 3 days), oldest first. History starts 2026-10-27.
+const supplyHistory = await tcg.cards.supplyHistory(13118, { days: 90 });
+
+// Bulk variant — up to 500 products per call, auto-chunks above that.
+// Products with no supply recorded yet are absent.
+const bulkSupply = await tcg.bulk.supply([13118, 13217, 13218]);
+```
+
 ### Top movers
 
 ```ts
