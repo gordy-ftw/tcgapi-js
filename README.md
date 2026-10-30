@@ -193,6 +193,24 @@ const history = await tcg.cards.history(123456, { range: 'year', include: 'ebay'
 Which cards have eBay data: `tcg.ebay.coverage()` (per game) or `tcg.ebay.coverage({ game: 'pokemon' })`
 (per set). Public: no key needed, not counted against quota.
 
+### Cardmarket (EU) prices
+
+`cards.cardmarketPrices(id)` returns Cardmarket's prices in EUR per printing, from Cardmarket's
+daily price guide: `price_trend`, `avg_sell_price`, `low_price` and 1/7/30-day averages, with
+`last_updated_at` the guide's date. `cm_series` says which of the product's two series the printing
+reads (`regular`, or `foil` — reverse holo for Pokemon). Where Cardmarket sells a card's editions as
+one product (Yu-Gi-Oh! 1st Edition + Unlimited) there is one `'All editions'` row with
+`editions_blended: true`. Throws `NotFoundError` when Cardmarket has no matching product.
+
+```ts
+const cm = await tcg.cards.cardmarketPrices(123456);
+for (const p of cm.data) console.log(p.printing, p.price_trend, p.currency, p.cm_url);
+
+// Every card in a set (Pro+), and coverage per game
+const set = await tcg.sets.cardmarketPrices(100001, { limit: 100 });
+const coverage = await tcg.cardmarket.coverage();
+```
+
 ### Identify a card from a photo
 
 `identify.photo()` reads one photo of a card, slab or sealed product and returns ranked

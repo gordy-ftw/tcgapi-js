@@ -1,5 +1,5 @@
 import type { TCGApi } from '../client';
-import type { BulkPriceRow, CardWithPrice, Response, Set as TcgSet } from '../types';
+import type { BulkPriceRow, CardWithPrice, CardmarketSetPrice, Response, Set as TcgSet } from '../types';
 
 export interface ListSetsParams {
   game?: string;
@@ -35,6 +35,11 @@ export class SetsResource {
   /** GET /sets/{id}/prices — every printing for every card. Starter+ */
   prices(id: number): Promise<Response<BulkPriceRow[]>> {
     return this.client.request<BulkPriceRow[]>('GET', `/sets/${id}/prices`);
+  }
+
+  /** GET /sets/{id}/prices/cardmarket — Cardmarket EU prices for every card in a set, highest trend first. Pro+ */
+  cardmarketPrices(id: number, params: { limit?: number; offset?: number } = {}): Promise<Response<CardmarketSetPrice[]>> {
+    return this.client.request<CardmarketSetPrice[]>('GET', `/sets/${id}/prices/cardmarket`, params);
   }
 
   /**

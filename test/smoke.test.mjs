@@ -126,6 +126,25 @@ test('cards.supply returns listings and a price ladder (Pro+; TierError below)',
   }
 });
 
+test('cardmarket prices and coverage without key return 402 typed errors', { skip: hasKey }, async () => {
+  for (const call of [() => tcg.cards.cardmarketPrices(5846), () => tcg.sets.cardmarketPrices(100001, { limit: 1 }), () => tcg.cardmarket.coverage()]) {
+    await assert.rejects(call, (err) => err instanceof TcgApiError && err.status === 402);
+  }
+});
+
+test('cards.cardmarketPrices returns EUR rows per printing; coverage has games', { skip: !hasKey }, async () => {
+  const resp = await tcg.cards.cardmarketPrices(5846);
+  assert.ok(resp.data.length > 0);
+  for (const row of resp.data) {
+    assert.equal(row.card_id, 5846);
+    assert.equal(row.currency, 'EUR');
+    assert.ok(row.cm_series === 'regular' || row.cm_series === 'foil');
+    assert.equal(typeof row.editions_blended, 'boolean');
+  }
+  const cov = await tcg.cardmarket.coverage();
+  assert.ok(cov.data.total_cards > 0 && cov.data.games.length > 0);
+});
+
 test('identify.photo without key: the photo is accepted, then x402 asks for payment (402)', { skip: hasKey }, async () => {
   // A malformed upload would be a 400 INVALID_IMAGE; reaching the 402 offer proves the multipart body is right.
   const err = await new TCGApi().identify.photo(await charizardPhoto()).then(() => null, (e) => e);

@@ -239,6 +239,62 @@ export interface EbayGameCoverage extends EbayCoverageGame {
   computed_at: string;
 }
 
+/**
+ * One printing's Cardmarket price (EUR) from Cardmarket's daily price guide. Each printing reads one Cardmarket product
+ * and one of its two series: `regular`, or `foil` (Pokemon: reverse holo).
+ */
+export interface CardmarketPrice {
+  card_id: number;
+  /** Our printing, or `'All editions'` when Cardmarket sells the card's editions as one product (Yu-Gi-Oh! 1st Edition + Unlimited). */
+  printing: string;
+  /** True for `'All editions'`: the price covers every edition, never one. */
+  editions_blended: boolean;
+  price_trend: number | null;
+  avg_sell_price: number | null;
+  /** Lowest listing. */
+  low_price: number | null;
+  avg_1d: number | null;
+  avg_7d: number | null;
+  avg_30d: number | null;
+  currency: 'EUR';
+  /** Date of the Cardmarket price guide the price came from (ISO 8601, UTC). */
+  last_updated_at: string | null;
+  cm_product_id: number;
+  cm_name: string;
+  /** Cardmarket product page, when known. */
+  cm_url: string | null;
+  cm_series: 'regular' | 'foil';
+  /** How the card was matched to the Cardmarket product (diagnostic). */
+  match_method: string;
+}
+
+/** A row of GET /sets/{id}/prices/cardmarket: the price plus the card's name, number and TCGPlayer id. */
+export interface CardmarketSetPrice extends CardmarketPrice {
+  name: string;
+  number: string | null;
+  tcgplayer_id: number | null;
+}
+
+export interface CardmarketCoverageGame {
+  game_id: number;
+  game: string | null;
+  game_slug: string | null;
+  cards: number;
+  printings: number;
+  priced_printings: number;
+  updated_at: string;
+}
+
+/** GET /cardmarket/coverage: cards, printings and priced printings per game (recomputed daily). */
+export interface CardmarketCoverage {
+  total_cards: number;
+  total_printings: number;
+  total_priced_printings: number;
+  price_guide_oldest: string | null;
+  price_guide_newest: string | null;
+  games: CardmarketCoverageGame[];
+}
+
 export interface ConditionPrice {
   card_id: number;
   printing: string;
