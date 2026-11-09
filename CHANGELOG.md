@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.13.1
+
+- Docs only, no code change: `cards.cardmarketPrices` now resolves with an empty array when Cardmarket has no
+  matching product for the card (the API answered 404 until 2026-11-09, so it threw `NotFoundError`).
+  `NotFoundError` is still thrown for an unknown card id.
+
 ## 0.13.0
 
 - `cards.cardmarketPrices(id, { printing })` (`GET /v1/cards/{id}/prices/cardmarket`): Cardmarket EU prices

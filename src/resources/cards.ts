@@ -50,7 +50,7 @@ export class CardsResource {
   /**
    * GET /cards/{id}/prices/cardmarket — Cardmarket EU prices (EUR) per printing, from Cardmarket's daily price guide.
    * A card whose editions Cardmarket sells as one product has a single `'All editions'` row (`editions_blended`).
-   * NotFoundError when Cardmarket has no matching product for the card.
+   * An empty array when Cardmarket has no matching product for the card; NotFoundError only for an unknown card id.
    */
   cardmarketPrices(id: number, params: { printing?: string } = {}): Promise<Response<CardmarketPrice[]>> {
     return this.client.request<CardmarketPrice[]>('GET', `/cards/${id}/prices/cardmarket`, params);
