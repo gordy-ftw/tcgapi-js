@@ -1,7 +1,7 @@
 {
   "name": "tcgapi",
-  "version": "0.13.1",
-  "description": "Official JavaScript/TypeScript SDK for tcgapi.dev — pricing data for Pokemon, Magic: The Gathering, Yu-Gi-Oh!, Lorcana, One Piece, Flesh and Blood, and 80+ more trading card games.",
+  "version": "0.13.2",
+  "description": "Official JavaScript/TypeScript SDK for tcgapi.dev — pricing data for Pokemon, Magic: The Gathering, Yu-Gi-Oh!, Lorcana, One Piece, Flesh and Blood, and 50+ more trading card games.",
   "keywords": [
     "tcg",
     "tcgplayer",
