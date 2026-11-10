@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/tcgapi.svg)](https://www.npmjs.com/package/tcgapi)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Official JavaScript / TypeScript SDK for [**tcgapi.dev**](https://tcgapi.dev) — a unified pricing API for **89+ trading card games**, including:
+Official JavaScript / TypeScript SDK for [**tcgapi.dev**](https://tcgapi.dev) — a unified pricing API for **50+ trading card games**, including:
 
 - Pokémon TCG (English + Japanese)
 - Magic: The Gathering
