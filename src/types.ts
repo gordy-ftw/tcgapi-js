@@ -563,7 +563,8 @@ export interface IdentifyResult {
 }
 
 export interface IdentifyMeta {
-  charged: 'scan' | 'x402';
+  /** `repeat`: the account sent this same photo in the last 24 hours, so the answer comes from that first read and no scan is used */
+  charged: 'scan' | 'x402' | 'repeat';
   /** Scans left after this one (API-key requests) */
   scans_remaining?: number;
 }
