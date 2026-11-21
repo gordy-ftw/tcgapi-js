@@ -156,7 +156,7 @@ test('identify.photo reads a card (uses one scan)', { skip: !hasKey }, async () 
   const resp = await tcg.identify.photo(await charizardPhoto(), { game: 'pokemon', includePrices: true });
   assert.equal(resp.data.candidates[0].tcgplayer_id, 42382);
   assert.ok(Array.isArray(resp.data.candidates[0].prices));
-  assert.equal(resp.meta?.charged, 'scan');
+  assert.ok(['scan', 'repeat'].includes(resp.meta?.charged), `charged ${resp.meta?.charged}`); // repeat: the same photo within 24 hours
   assert.equal(typeof resp.meta?.scans_remaining, 'number');
 });
 
